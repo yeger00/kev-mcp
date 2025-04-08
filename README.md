@@ -52,6 +52,16 @@ cisa-vuln-checker recent-cves --hours 24
 cisa-vuln-checker check-cve CVE-2023-1234
 ```
 
+### Running the MCP Server
+
+To run the Model Context Protocol server:
+
+```bash
+uvicorn cisa_vuln_checker.mcp_server:app
+```
+
+This will start the server on the default port (8000). You can then interact with the CISA vulnerability checking tools through the MCP interface.
+
 ## Development
 
 ### Running Tests
