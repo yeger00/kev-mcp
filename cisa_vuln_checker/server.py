@@ -13,7 +13,7 @@ async def homepage(request):
 app = Starlette(
     routes=[
         Route('/', endpoint=homepage),
-        Mount('/sse', app=mcp.sse_app()),
+        Mount('/', app=mcp.sse_app()),
         Mount('/rest', app=create_rest_app()),
         Mount('/static', app=StaticFiles(directory='cisa_vuln_checker/static'), name='static')
     ]
