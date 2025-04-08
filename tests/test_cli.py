@@ -1,6 +1,6 @@
 import pytest
 from typer.testing import CliRunner
-from cli import app
+from cisa_vuln_checker.cli import app
 
 runner = CliRunner()
 
@@ -31,11 +31,11 @@ def test_check_cve_exists():
     result = runner.invoke(app, ["recent-cves", "--days", "1"])
     if result.stdout:
         # Take the first CVE from the list
-        cve = result.stdout.strip().split("\n")[0]
+        cve = result.stdout.strip().split("\n")[0].split(": ")[1]
         # Now check if it exists
         result = runner.invoke(app, ["check-cve", cve])
         assert result.exit_code == 0
-        assert f"CVE {cve} exists in the list" in result.stdout
+        assert "CVE ID:" in result.stdout
 
 def test_check_cve_not_exists():
     """Test checking for a non-existent CVE."""

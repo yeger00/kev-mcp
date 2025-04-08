@@ -2,6 +2,7 @@ import typer
 from typing import Optional
 from cisa_vuln_checker import get_recent_cves, check_cve_exists
 import json
+import sys
 
 app = typer.Typer()
 
@@ -12,6 +13,10 @@ def recent_cves(
     json_output: bool = typer.Option(False, "--json", help="Output in JSON format")
 ):
     """Get all CVEs added in the last X days or hours."""
+    if days is None and hours is None:
+        print("Either days or hours must be specified", file=sys.stderr)
+        raise typer.Exit(1)
+    
     vulnerabilities = get_recent_cves(days, hours)
     
     if json_output:

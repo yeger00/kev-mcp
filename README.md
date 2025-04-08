@@ -27,35 +27,38 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+4. Install the package in development mode:
+```bash
+pip install -e .
+```
+
 ## Usage
 
 ### Get Recent CVEs
 
 Get CVEs from the last 7 days:
 ```bash
-python cli.py recent-cves --days 7
+cisa-vuln-checker recent-cves --days 7
 ```
 
 Get CVEs from the last 24 hours:
 ```bash
-python cli.py recent-cves --hours 24
+cisa-vuln-checker recent-cves --hours 24
 ```
 
 ### Check if a CVE Exists
 
 ```bash
-python cli.py check-cve CVE-2023-1234
+cisa-vuln-checker check-cve CVE-2023-1234
 ```
 
-## Running Tests
+## Development
+
+### Running Tests
 
 The project includes integration tests that test the CLI commands. To run the tests:
 
-1. Make sure you have pytest installed:
-```bash
-pip install pytest
-```
-
+1. Make sure you have the package installed in development mode (see Installation step 4)
 2. Run the tests:
 ```bash
 pytest tests/
@@ -68,9 +71,14 @@ The tests will:
 
 ## Project Structure
 
-- `cisa_vuln_checker.py`: Core logic for querying the CISA database
-- `cli.py`: Command-line interface using Typer
-- `tests/test_cli.py`: Integration tests for the CLI commands
+- `cisa_vuln_checker/`: Main package directory
+  - `__init__.py`: Package initialization and exports
+  - `cisa_vuln_checker.py`: Core logic for querying the CISA database
+  - `cli.py`: Command-line interface using Typer
+- `tests/`: Test directory
+  - `__init__.py`: Test package initialization
+  - `test_cli.py`: Integration tests for the CLI commands
+- `setup.py`: Package configuration for development installation
 
 ## Dependencies
 
