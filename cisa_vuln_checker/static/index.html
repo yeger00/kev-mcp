@@ -28,12 +28,18 @@
             border-radius: 5px;
             margin: 10px 0;
         }
+        .rest-endpoint {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
     <h1>MCP - Model Control Protocol Server</h1>
     
-    <p>Welcome to the MCP (Model Control Protocol) server. This service facilitates communication between Claude and Cursor for enhanced AI assistance capabilities.</p>
+    <p>Welcome to the MCP (Model Control Protocol) server. This service facilitates communication between Claude and Cursor for enhanced AI assistance capabilities and provides access to the CISA Known Exploited Vulnerabilities (KEV) catalog.</p>
 
     <h2>Available Endpoints</h2>
     
@@ -43,10 +49,66 @@
         <p>This is the main Server-Sent Events (SSE) endpoint that enables real-time communication between Claude and Cursor.</p>
     </div>
 
+    <h2>REST API Endpoints</h2>
+    <div class="rest-endpoint">
+        <h3>Health Check</h3>
+        <code>GET http://127.0.0.1:8000/rest/health</code>
+        <p>Check the health status of the server.</p>
+    </div>
+
+    <div class="rest-endpoint">
+        <h3>Server Status</h3>
+        <code>GET http://127.0.0.1:8000/rest/status</code>
+        <p>Get current server status and available endpoints.</p>
+    </div>
+
+    <div class="rest-endpoint">
+        <h3>Check CVE Existence</h3>
+        <code>GET http://127.0.0.1:8000/rest/check-cve?cve_id=CVE-2024-1234</code>
+        <p>Check if a specific CVE exists in the CISA Known Exploited Vulnerabilities (KEV) catalog and get its details.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>cve_id</code> (required) - The CVE ID to check (e.g., CVE-2024-1234)</li>
+        </ul>
+        <h4>Response includes:</h4>
+        <ul>
+            <li>Vendor/Project information</li>
+            <li>Product details</li>
+            <li>Vulnerability name and description</li>
+            <li>Date added to KEV catalog</li>
+            <li>Required action and due date</li>
+            <li>Known ransomware campaign use</li>
+            <li>Additional notes and CWEs</li>
+        </ul>
+    </div>
+
+    <div class="rest-endpoint">
+        <h3>Get Recent CVEs</h3>
+        <code>GET http://127.0.0.1:8000/rest/recent-cves?days=7</code>
+        <p>Get a list of recent CVEs from the CISA KEV catalog.</p>
+        <h4>Parameters:</h4>
+        <ul>
+            <li><code>days</code> (optional) - Number of days to look back (1-30, default: 7)</li>
+        </ul>
+        <h4>Response includes:</h4>
+        <ul>
+            <li>Total number of CVEs found</li>
+            <li>Days range searched</li>
+            <li>Full details for each CVE from the KEV catalog</li>
+        </ul>
+    </div>
+
+    <div class="rest-endpoint">
+        <h3>API Documentation</h3>
+        <code>GET http://127.0.0.1:8000/rest/docs</code>
+        <p>View the OpenAPI documentation for all REST endpoints.</p>
+    </div>
+
     <h2>How to Use</h2>
     <ol>
         <li>Ensure the MCP server is running on port 8000 (default)</li>
         <li>Connect to the SSE endpoint at <code>/sse</code> for real-time updates</li>
+        <li>Use the REST API endpoints at <code>/rest/*</code> to query the CISA KEV catalog</li>
         <li>Use Cursor with Claude to leverage the enhanced capabilities provided by this integration</li>
     </ol>
 
@@ -57,6 +119,7 @@
     <ul>
         <li><a href="https://cursor.sh">Cursor IDE</a></li>
         <li><a href="https://anthropic.com/claude">Claude AI</a></li>
+        <li><a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog">CISA KEV Catalog</a></li>
     </ul>
 </body>
 </html> 

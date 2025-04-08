@@ -5,6 +5,7 @@ from starlette.responses import FileResponse
 import os
 
 from .mcp_server import mcp
+from .rest_api import create_rest_app
 
 async def homepage(request):
     return FileResponse('cisa_vuln_checker/static/index.html')
@@ -13,6 +14,7 @@ app = Starlette(
     routes=[
         Route('/', endpoint=homepage),
         Mount('/sse', app=mcp.sse_app()),
+        Mount('/rest', app=create_rest_app()),
         Mount('/static', app=StaticFiles(directory='cisa_vuln_checker/static'), name='static')
     ]
 )
