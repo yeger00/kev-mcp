@@ -22,12 +22,7 @@ python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-3. Install the dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-4. Install the package in development mode:
+3. Install the package in development mode:
 ```bash
 pip install -e .
 ```
@@ -52,15 +47,33 @@ cisa-vuln-checker recent-cves --hours 24
 cisa-vuln-checker check-cve CVE-2023-1234
 ```
 
-### Running the MCP Server
+### Running the Server
 
 To run the Model Context Protocol server:
 
 ```bash
-uvicorn cisa_vuln_checker.mcp_server:app
+uvicorn cisa_vuln_checker.server:app
 ```
 
-This will start the server on the default port (8000). You can then interact with the CISA vulnerability checking tools through the MCP interface.
+This will start the server on the default port (8000). You can then interact with the CISA vulnerability checking tools through the MCP interface (`/sse`) or RESR (`/rest`).
+
+### Configuring the Server
+#### Claude
+To configure Claude to use the CISA vulnerability checker server, add the following to your Claude configuration file (usually located at `~/Library/Application Support/Claude/claude_desktop_config.json`):
+
+```
+{
+  "mcpServers": {
+    "cisa": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "http://localhost:8000/sse"
+      ]
+    }
+  }
+} 
+```
 
 ## Development
 
@@ -78,21 +91,3 @@ The tests will:
 - Test getting recent CVEs by days and hours
 - Test error handling when no arguments are provided
 - Test checking for existing and non-existing CVEs
-
-## Project Structure
-
-- `cisa_vuln_checker/`: Main package directory
-  - `__init__.py`: Package initialization and exports
-  - `cisa_vuln_checker.py`: Core logic for querying the CISA database
-  - `cli.py`: Command-line interface using Typer
-- `tests/`: Test directory
-  - `__init__.py`: Test package initialization
-  - `test_cli.py`: Integration tests for the CLI commands
-- `setup.py`: Package configuration for development installation
-
-## Dependencies
-
-- Python 3.7+
-- duckdb
-- typer
-- pytest (for running tests) 
