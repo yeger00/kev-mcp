@@ -1,12 +1,12 @@
 import typer
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, List, Dict
 import duckdb
 from pathlib import Path
 
 app = typer.Typer()
 
-def get_recent_cves(days: Optional[int] = None, hours: Optional[int] = None) -> list[str]:
+def get_recent_cves(days: Optional[int] = None, hours: Optional[int] = None) -> List[Dict]:
     """
     Get all CVEs added in the last X days or hours.
     
@@ -15,7 +15,7 @@ def get_recent_cves(days: Optional[int] = None, hours: Optional[int] = None) -> 
         hours: Number of hours to look back
         
     Returns:
-        List of CVE IDs
+        List of dictionaries containing vulnerability details
     """
     if days is None and hours is None:
         raise ValueError("Either days or hours must be specified")
@@ -34,25 +34,58 @@ def get_recent_cves(days: Optional[int] = None, hours: Optional[int] = None) -> 
     conn.execute("LOAD httpfs;")
     
     query = f"""
-    SELECT cveID
-    FROM read_json_auto('https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json')
-    WHERE dateAdded >= '{cutoff_date.strftime("%Y-%m-%d")}'
+    WITH vulnerabilities AS (
+        SELECT unnest(data.vulnerabilities) as vuln
+        FROM read_json_auto('https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json') as data
+    )
+    SELECT 
+        vuln.cveID,
+        vuln.vendorProject,
+        vuln.product,
+        vuln.vulnerabilityName,
+        vuln.dateAdded,
+        vuln.shortDescription,
+        vuln.requiredAction,
+        vuln.dueDate,
+        vuln.knownRansomwareCampaignUse,
+        vuln.notes,
+        vuln.cwes
+    FROM vulnerabilities
+    WHERE vuln.dateAdded >= '{cutoff_date.strftime("%Y-%m-%d")}'
     """
     
     result = conn.execute(query).fetchall()
     conn.close()
     
-    return [row[0] for row in result]
+    # Convert the result to a list of dictionaries
+    vulnerabilities = []
+    for row in result:
+        vulnerability = {
+            "cveID": row[0],
+            "vendorProject": row[1],
+            "product": row[2],
+            "vulnerabilityName": row[3],
+            "dateAdded": row[4],
+            "shortDescription": row[5],
+            "requiredAction": row[6],
+            "dueDate": row[7],
+            "knownRansomwareCampaignUse": row[8],
+            "notes": row[9],
+            "cwes": row[10]
+        }
+        vulnerabilities.append(vulnerability)
+    
+    return vulnerabilities
 
-def check_cve_exists(cve_id: str) -> bool:
+def check_cve_exists(cve_id: str) -> Optional[Dict]:
     """
-    Check if a given CVE exists in the list.
+    Check if a given CVE exists in the list and return its details.
     
     Args:
         cve_id: The CVE ID to check (e.g., "CVE-2023-1234")
         
     Returns:
-        True if the CVE exists, False otherwise
+        Dictionary containing vulnerability details if found, None otherwise
     """
     conn = duckdb.connect()
     # Enable HTTPFS extension
@@ -60,15 +93,44 @@ def check_cve_exists(cve_id: str) -> bool:
     conn.execute("LOAD httpfs;")
     
     query = f"""
-    SELECT COUNT(*) as count
-    FROM read_json_auto('https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json')
-    WHERE cveID = '{cve_id}'
+    WITH vulnerabilities AS (
+        SELECT unnest(data.vulnerabilities) as vuln
+        FROM read_json_auto('https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json') as data
+    )
+    SELECT 
+        vuln.cveID,
+        vuln.vendorProject,
+        vuln.product,
+        vuln.vulnerabilityName,
+        vuln.dateAdded,
+        vuln.shortDescription,
+        vuln.requiredAction,
+        vuln.dueDate,
+        vuln.knownRansomwareCampaignUse,
+        vuln.notes,
+        vuln.cwes
+    FROM vulnerabilities
+    WHERE vuln.cveID = '{cve_id}'
     """
     
     result = conn.execute(query).fetchone()
     conn.close()
     
-    return result[0] > 0
+    if result:
+        return {
+            "cveID": result[0],
+            "vendorProject": result[1],
+            "product": result[2],
+            "vulnerabilityName": result[3],
+            "dateAdded": result[4],
+            "shortDescription": result[5],
+            "requiredAction": result[6],
+            "dueDate": result[7],
+            "knownRansomwareCampaignUse": result[8],
+            "notes": result[9],
+            "cwes": result[10]
+        }
+    return None
 
 @app.command()
 def recent_cves(
