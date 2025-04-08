@@ -1,7 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 from typing import Optional, List, Dict
-from starlette.applications import Starlette
-from starlette.routing import Mount
+
 from .cisa_vuln_checker import get_recent_cves, check_cve_exists
 
 # Create an MCP server
@@ -72,19 +71,3 @@ Please ensure to:
 4. Verify the fix has been successfully applied
 5. Document all actions taken
 """
-
-app = Starlette(
-    routes=[
-        Mount('/', app=mcp.sse_app()),
-    ]
-)
-
-if __name__ == "__main__":
-    import uvicorn
-    import os
-    
-    port = int(os.getenv("MCP_PORT", "8000"))
-    uvicorn.run(app, host="0.0.0.0", port=port)
-
-# To run the server:
-# uvicorn cisa_vuln_checker.mcp_server:app

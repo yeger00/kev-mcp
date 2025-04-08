@@ -2,7 +2,6 @@ import typer
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict
 import duckdb
-from pathlib import Path
 
 app = typer.Typer()
 

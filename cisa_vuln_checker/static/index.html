@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP - Claude Integration Guide</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        code {
+            background-color: #f5f5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .endpoint {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>MCP - Model Control Protocol Server</h1>
+    
+    <p>Welcome to the MCP (Model Control Protocol) server. This service facilitates communication between Claude and Cursor for enhanced AI assistance capabilities.</p>
+
+    <h2>Available Endpoints</h2>
+    
+    <div class="endpoint">
+        <h3>SSE Endpoint</h3>
+        <code>http://127.0.0.1:8000/sse</code>
+        <p>This is the main Server-Sent Events (SSE) endpoint that enables real-time communication between Claude and Cursor.</p>
+    </div>
+
+    <h2>How to Use</h2>
+    <ol>
+        <li>Ensure the MCP server is running on port 8000 (default)</li>
+        <li>Connect to the SSE endpoint at <code>/sse</code> for real-time updates</li>
+        <li>Use Cursor with Claude to leverage the enhanced capabilities provided by this integration</li>
+    </ol>
+
+    <h2>Configuration</h2>
+    <p>The server port can be configured using the <code>MCP_PORT</code> environment variable (default: 8000)</p>
+
+    <h2>Additional Resources</h2>
+    <ul>
+        <li><a href="https://cursor.sh">Cursor IDE</a></li>
+        <li><a href="https://anthropic.com/claude">Claude AI</a></li>
+    </ul>
+</body>
+</html> 
