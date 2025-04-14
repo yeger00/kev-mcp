@@ -6,7 +6,43 @@ from typing import Optional, List, Dict
 from pydantic import BaseModel
 import os
 from .cisa_vuln_checker import get_recent_cves, check_cve_exists
-from .rest_api import app
+from .routers.cisa import router as cisa_router
+
+
+class HealthResponse(BaseModel):
+    status: str
+    version: str
+
+class StatusResponse(BaseModel):
+    server_status: str
+    endpoints: Dict[str, str]
+
+
+app = FastAPI(
+    title="MCP REST API",
+    description="REST API endpoints for the Model Control Protocol and CISA Known Exploited Vulnerabilities",
+    version="1.0.0"
+)
+
+app.include_router(cisa_router)
+@app.get("/health", response_model=HealthResponse)
+async def health_check():
+    return {
+        "status": "healthy",
+        "version": "1.0.0"
+    }
+
+
+@app.get("/status", response_model=StatusResponse)
+async def get_status():
+    return {
+        "server_status": "running",
+        "endpoints": {
+            "sse": "/sse",
+            "rest": "/rest/*",
+            "docs": "/rest/docs"
+        }
+    }
 
 # Create and mount the FastAPI MCP server
 mcp = FastApiMCP(
