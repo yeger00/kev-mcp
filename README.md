@@ -27,6 +27,17 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -e .
 ```
 
+## Docker
+Build the image:
+```
+docker build -t cisa-vuln-checker .
+```
+
+Run the container:
+```
+docker run -p 8080:8080 cisa-vuln-checker
+```
+
 ## Usage
 
 ### Get Recent CVEs

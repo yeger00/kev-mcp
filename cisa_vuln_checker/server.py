@@ -24,6 +24,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
+
 app.include_router(cisa_router)
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
@@ -43,6 +44,7 @@ async def get_status():
             "docs": "/rest/docs"
         }
     }
+
 
 # Create and mount the FastAPI MCP server
 mcp = FastApiMCP(
