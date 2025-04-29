@@ -21,11 +21,13 @@ class StatusResponse(BaseModel):
 app = FastAPI(
     title="MCP REST API",
     description="REST API endpoints for the Model Control Protocol and CISA Known Exploited Vulnerabilities",
-    version="1.0.0"
+    version="1.0.0",
+    root_path="cisa-kev",
 )
 
 
 app.include_router(cisa_router)
+
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
     return {

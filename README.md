@@ -1,14 +1,37 @@
-# CISA Vulnerability Checker
+# CISA Vulnerability Checker MCP Server
 
-A Python tool that uses DuckDB to query CISA's Known Exploited Vulnerabilities catalog.
+A Model Control Protocol (MCP) server that provides access to CISA's Known Exploited Vulnerabilities (KEV) catalog through Claude and Cursor integration.
 
-## Features
+## MCP Server Functionality
 
-- Get all CVEs added in the last X days or hours
-- Check if a specific CVE exists in the list
-- Uses DuckDB's HTTPFS extension to read the JSON file directly from CISA's website
+The MCP server provides real-time access to CISA's KEV catalog through Claude and Cursor integration. It enables:
+- Real-time CVE checking and monitoring
+- Integration with Claude for enhanced security analysis
+- Access to the complete CISA KEV catalog
 
-## Installation
+### Production Deployment
+
+The MCP server is available at: `https://amcipi.com/cisa-kev/`
+
+To configure Claude to use the CISA vulnerability checker server, add the following to your Claude configuration file (usually located at `~/Library/Application Support/Claude/claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "cisa": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://amcipi.com/cisa-kev/mcp"
+      ]
+    }
+  }
+}
+```
+
+## Installation Options
+
+### Option 1: Install from Repository
 
 1. Clone this repository:
 ```bash
@@ -27,20 +50,39 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -e .
 ```
 
-## Docker
-Build the image:
+### Option 2: Run Directly from Repository
+
+To run the MCP server directly:
+
+```bash
+uvicorn cisa_vuln_checker.server:app
 ```
+
+This will start the server on the default port (8000).
+
+### Option 3: Run with Docker
+
+Build the image:
+```bash
 docker build -t cisa-vuln-checker .
 ```
 
 Run the container:
-```
+```bash
 docker run -p 8080:8080 cisa-vuln-checker
 ```
 
-## Usage
+## API Functionality
 
-### Get Recent CVEs
+### REST API Endpoints
+
+- Health Check: `GET /rest/health`
+- Server Status: `GET /rest/status`
+- Check CVE: `GET /rest/check-cve?cve_id=CVE-2024-1234`
+- Recent CVEs: `GET /rest/recent-cves?days=7`
+- API Documentation: `GET /rest/docs`
+
+### CLI Commands
 
 Get CVEs from the last 7 days:
 ```bash
@@ -52,38 +94,9 @@ Get CVEs from the last 24 hours:
 cisa-vuln-checker recent-cves --hours 24
 ```
 
-### Check if a CVE Exists
-
+Check if a CVE exists:
 ```bash
 cisa-vuln-checker check-cve CVE-2023-1234
-```
-
-### Running the Server
-
-To run the Model Context Protocol server:
-
-```bash
-uvicorn cisa_vuln_checker.server:app
-```
-
-This will start the server on the default port (8000). You can then interact with the CISA vulnerability checking tools through the MCP interface (`/sse`) or RESR (`/rest`).
-
-### Configuring the Server
-#### Claude
-To configure Claude to use the CISA vulnerability checker server, add the following to your Claude configuration file (usually located at `~/Library/Application Support/Claude/claude_desktop_config.json`):
-
-```
-{
-  "mcpServers": {
-    "cisa": {
-      "command": "npx",
-      "args": [
-        "mcp-remote",
-        "http://localhost:8000/sse"
-      ]
-    }
-  }
-} 
 ```
 
 ## Development
@@ -92,7 +105,7 @@ To configure Claude to use the CISA vulnerability checker server, add the follow
 
 The project includes integration tests that test the CLI commands. To run the tests:
 
-1. Make sure you have the package installed in development mode (see Installation step 4)
+1. Make sure you have the package installed in development mode
 2. Run the tests:
 ```bash
 pytest tests/
