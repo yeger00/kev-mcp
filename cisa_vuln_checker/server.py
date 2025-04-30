@@ -22,7 +22,6 @@ app = FastAPI(
     title="MCP REST API",
     description="REST API endpoints for the Model Control Protocol and CISA Known Exploited Vulnerabilities",
     version="1.0.0",
-    root_path="cisa-kev",
 )
 
 
@@ -53,6 +52,7 @@ mcp = FastApiMCP(
     app,
     name="CISA Vulnerability Checker",
     description="A server for checking CISA Known Exploited Vulnerabilities",
+    base_url="/cisa-kev/"
 )
 mcp.mount()
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")

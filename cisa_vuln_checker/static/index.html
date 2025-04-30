@@ -3,123 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MCP - Claude Integration Guide</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            color: #333;
+    <title>CISA KEV MCP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0066cc',
+                        dark: {
+                            bg: '#1a1a1a',
+                            text: '#ffffff',
+                            endpoint: '#1b3a1b',
+                            config: '#3a2a1a'
+                        }
+                    }
+                }
+            }
         }
-        h1, h2 {
-            color: #2c3e50;
-        }
-        code {
-            background-color: #f5f5f5;
-            padding: 2px 5px;
-            border-radius: 3px;
-            font-family: 'Courier New', Courier, monospace;
-        }
-        .endpoint {
-            background-color: #e8f5e9;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-        .rest-endpoint {
-            background-color: #e3f2fd;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 10px 0;
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .dark {
+                color-scheme: dark;
+            }
         }
     </style>
 </head>
-<body>
-    <h1>MCP - Model Control Protocol Server</h1>
-    
-    <p>Welcome to the MCP (Model Control Protocol) server. This service facilitates communication between Claude and Cursor for enhanced AI assistance capabilities and provides access to the CISA Known Exploited Vulnerabilities (KEV) catalog.</p>
+<body class="bg-white dark:bg-dark-bg text-gray-800 dark:text-white transition-colors duration-300">
+    <a href="https://github.com/yeger00/kev-mcp" class="fixed top-5 right-5 z-50 text-gray-800 dark:text-white hover:text-primary dark:hover:text-primary transition-colors" target="_blank">
+        <svg height="32" width="32" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+        </svg>
+    </a>
 
-    <h2>Available Endpoints</h2>
-    
-    <div class="endpoint">
-        <h3>SSE Endpoint</h3>
-        <code>http://127.0.0.1:8000/sse</code>
-        <p>This is the main Server-Sent Events (SSE) endpoint that enables real-time communication between Claude and Cursor.</p>
+    <button id="theme-toggle" type="button" class="fixed top-5 right-20 z-50 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+        </svg>
+        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path>
+        </svg>
+    </button>
+
+    <div class="max-w-3xl mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-4">CISA KEV MCP</h1>
+        
+        <p class="mb-6">This service provides access to the <a href="https://www.cisa.gov/known-exploited-vulnerabilities" class="text-primary hover:underline">CISA Known Exploited Vulnerabilities (KEV)</a> catalog, allowing you to check and monitor known exploited vulnerabilities in your systems.</p>
+
+        <h2 class="text-2xl font-bold mb-4">Configuration</h2>
+        <div class="bg-orange-50 dark:bg-dark-config p-6 rounded-lg mb-6">
+            <h3 class="text-xl font-semibold mb-2">Adding to Claude Desktop</h3>
+            <p class="mb-4">To add this MCP to Claude Desktop, update your claude_desktop_config.json:</p>
+            <pre class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto"><code>{
+  "mcpServers": {
+    "pydantic-ai Docs": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://amcipi.com/cisa-kev/mcp"
+      ]
+    }
+  }
+}</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4">Available Tools</h2>
+        <div class="bg-green-50 dark:bg-dark-endpoint p-6 rounded-lg mb-6">
+            <h3 class="text-xl font-semibold mb-2">Check CVE Existence</h3>
+            <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">GET http://127.0.0.1:8000/rest/check-cve?cve_id=CVE-2024-1234</code>
+            <p class="mt-2">Check if a specific CVE exists in the CISA Known Exploited Vulnerabilities (KEV) catalog and get its details.</p>
+            <h4 class="font-semibold mt-4">Response includes:</h4>
+            <ul class="list-disc pl-6 mt-2">
+                <li>Vendor/Project information</li>
+                <li>Product details</li>
+                <li>Vulnerability name and description</li>
+                <li>Date added to KEV catalog</li>
+                <li>Required action and due date</li>
+                <li>Known ransomware campaign use</li>
+                <li>Additional notes and CWEs</li>
+            </ul>
+        </div>
+
+        <div class="bg-green-50 dark:bg-dark-endpoint p-6 rounded-lg">
+            <h3 class="text-xl font-semibold mb-2">Get Recent CVEs</h3>
+            <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">GET http://127.0.0.1:8000/rest/recent-cves?days=7</code>
+            <p class="mt-2">Get a list of recent CVEs from the CISA KEV catalog.</p>
+            <h4 class="font-semibold mt-4">Parameters:</h4>
+            <ul class="list-disc pl-6 mt-2">
+                <li><code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">days</code> (optional) - Number of days to look back (1-30, default: 7)</li>
+            </ul>
+            <h4 class="font-semibold mt-4">Response includes:</h4>
+            <ul class="list-disc pl-6 mt-2">
+                <li>Total number of CVEs found</li>
+                <li>Days range searched</li>
+                <li>Full details for each CVE from the KEV catalog</li>
+            </ul>
+        </div>
     </div>
 
-    <h2>REST API Endpoints</h2>
-    <div class="rest-endpoint">
-        <h3>Health Check</h3>
-        <code>GET http://127.0.0.1:8000/rest/health</code>
-        <p>Check the health status of the server.</p>
-    </div>
+    <script>
+        var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 
-    <div class="rest-endpoint">
-        <h3>Server Status</h3>
-        <code>GET http://127.0.0.1:8000/rest/status</code>
-        <p>Get current server status and available endpoints.</p>
-    </div>
+        // Change the icons inside the button based on previous settings
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
 
-    <div class="rest-endpoint">
-        <h3>Check CVE Existence</h3>
-        <code>GET http://127.0.0.1:8000/rest/check-cve?cve_id=CVE-2024-1234</code>
-        <p>Check if a specific CVE exists in the CISA Known Exploited Vulnerabilities (KEV) catalog and get its details.</p>
-        <h4>Parameters:</h4>
-        <ul>
-            <li><code>cve_id</code> (required) - The CVE ID to check (e.g., CVE-2024-1234)</li>
-        </ul>
-        <h4>Response includes:</h4>
-        <ul>
-            <li>Vendor/Project information</li>
-            <li>Product details</li>
-            <li>Vulnerability name and description</li>
-            <li>Date added to KEV catalog</li>
-            <li>Required action and due date</li>
-            <li>Known ransomware campaign use</li>
-            <li>Additional notes and CWEs</li>
-        </ul>
-    </div>
+        var themeToggleBtn = document.getElementById('theme-toggle');
 
-    <div class="rest-endpoint">
-        <h3>Get Recent CVEs</h3>
-        <code>GET http://127.0.0.1:8000/rest/recent-cves?days=7</code>
-        <p>Get a list of recent CVEs from the CISA KEV catalog.</p>
-        <h4>Parameters:</h4>
-        <ul>
-            <li><code>days</code> (optional) - Number of days to look back (1-30, default: 7)</li>
-        </ul>
-        <h4>Response includes:</h4>
-        <ul>
-            <li>Total number of CVEs found</li>
-            <li>Days range searched</li>
-            <li>Full details for each CVE from the KEV catalog</li>
-        </ul>
-    </div>
+        themeToggleBtn.addEventListener('click', function() {
+            // Toggle icons inside button
+            themeToggleDarkIcon.classList.toggle('hidden');
+            themeToggleLightIcon.classList.toggle('hidden');
 
-    <div class="rest-endpoint">
-        <h3>API Documentation</h3>
-        <code>GET http://127.0.0.1:8000/rest/docs</code>
-        <p>View the OpenAPI documentation for all REST endpoints.</p>
-    </div>
-
-    <h2>How to Use</h2>
-    <ol>
-        <li>Ensure the MCP server is running on port 8000 (default)</li>
-        <li>Connect to the SSE endpoint at <code>/sse</code> for real-time updates</li>
-        <li>Use the REST API endpoints at <code>/rest/*</code> to query the CISA KEV catalog</li>
-        <li>Use Cursor with Claude to leverage the enhanced capabilities provided by this integration</li>
-    </ol>
-
-    <h2>Configuration</h2>
-    <p>The server port can be configured using the <code>MCP_PORT</code> environment variable (default: 8000)</p>
-
-    <h2>Additional Resources</h2>
-    <ul>
-        <li><a href="https://cursor.sh">Cursor IDE</a></li>
-        <li><a href="https://anthropic.com/claude">Claude AI</a></li>
-        <li><a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog">CISA KEV Catalog</a></li>
-    </ul>
+            // If set via local storage previously
+            if (localStorage.getItem('color-theme')) {
+                if (localStorage.getItem('color-theme') === 'light') {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                }
+            } else {
+                // If NOT set via local storage previously
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                }
+            }
+        });
+    </script>
 </body>
 </html> 
