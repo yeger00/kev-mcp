@@ -1,67 +1,54 @@
-from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-from fastapi_mcp import FastApiMCP
+from mcp.server.fastmcp import FastMCP
 from typing import Optional, List, Dict
 from pydantic import BaseModel
-import os
-from .cisa_vuln_checker import get_recent_cves, check_cve_exists
-from .routers.cisa import router as cisa_router
+
+from fastapi import APIRouter, Query, HTTPException
+from pydantic import BaseModel
+from typing import Optional, List, Dict, Any
+from pydantic import Field
+
+from .cisa_vuln_checker import check_cve_exists as check_cve, get_recent_cves as get_cves
 
 
-class HealthResponse(BaseModel):
-    status: str
-    version: str
+class CVEResponse(BaseModel):
+    exists: bool
+    details: Optional[Dict[str, Any]] = None
 
-class StatusResponse(BaseModel):
-    server_status: str
-    endpoints: Dict[str, str]
+class RecentCVEsResponse(BaseModel):
+    total: int
+    days_range: int
+    cves: List[Dict[str, Any]]
 
 
-app = FastAPI(
-    title="MCP REST API",
-    description="REST API endpoints for the Model Control Protocol and CISA Known Exploited Vulnerabilities",
-    version="1.0.0",
-    root_path="/cisa-kev",
+# This is a bit of weird place to choose the port
+# Create server with database lifecycle management
+mcp = FastMCP(
+    "CISA KEV MCP",
+    port=8080,
+    sse_path="kev-mcp",
 )
 
 
-app.include_router(cisa_router)
-
-@app.get("/health", response_model=HealthResponse)
-async def health_check():
+@mcp.tool("check-cve", description="Check if a given CVE exists in the list.")
+async def check_cve_exists(
+    cve_id: str = Field(description="The CVE ID to check (e.g., CVE-2024-1234)"),
+) -> CVEResponse:
+    result = check_cve(cve_id)
+    if result is None:
+        return {"exists": False}
+    
     return {
-        "status": "healthy",
-        "version": "1.0.0"
+        "exists": True,
+        "details": result
     }
+    
 
-
-@app.get("/status", response_model=StatusResponse)
-async def get_status():
+@mcp.tool("recent-cves", description="Get all CVEs added in the last X days.")
+async def get_recent_cves(days: int = Field(7, ge=1, le=30, description="Number of days to look back (1-30)")):
+    cves = get_cves(days=days)
+    
     return {
-        "server_status": "running",
-        "endpoints": {
-            "sse": "/sse",
-            "rest": "/rest/*",
-            "docs": "/rest/docs"
-        }
+        "total": len(cves),
+        "days_range": days,
+        "cves": cves
     }
-
-
-# Create and mount the FastAPI MCP server
-mcp = FastApiMCP(
-    app,
-    name="CISA Vulnerability Checker",
-    description="A server for checking CISA Known Exploited Vulnerabilities",
-)
-mcp.mount()
-app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
-
-@app.get("/")
-async def read_index():
-    return FileResponse(os.path.join(os.path.dirname(__file__), "static", "index.html"))
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8000)
