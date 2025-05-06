@@ -24,7 +24,8 @@ class RecentCVEsResponse(BaseModel):
 # Create server with database lifecycle management
 mcp = FastMCP(
     "CISA KEV MCP",
-    port=8080
+    port=8080,
+    sse_path="kev-mcp",
 )
 
 
