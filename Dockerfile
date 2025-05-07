@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 8080
 
 # Run the application
-CMD ["uvicorn", "cisa_vuln_checker.server:app", "--host=0.0.0.0", "--port=8080"] 
+CMD ["python", "main.py"]

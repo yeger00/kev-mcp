@@ -25,7 +25,8 @@ class RecentCVEsResponse(BaseModel):
 mcp = FastMCP(
     "CISA KEV MCP",
     port=8080,
-    sse_path="kev-mcp",
+    sse_path="/cisa-kev/sse",
+    message_path="/cisa-kev/messages/",
 )
 
 
